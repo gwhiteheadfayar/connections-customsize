@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "N-size connections",
+  "name": "A React Variation of NYT's Connections with N-size categories and words",
   "icons": [
     {
       "src": "favicon.ico",

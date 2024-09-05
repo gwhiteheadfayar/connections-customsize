@@ -1,25 +1,79 @@
-import logo from './logo.svg';
-import './App.css';
+import './index.css';
+import React, { useState } from 'react';
+import GameCreator from './GameCreator';
+import GameBoard from './GameBoard';
+import { generateGameCode, parseGameCode } from './gameCodeUtils';
+import Button from './components/Button';
+import Input from './components/Input';
 
-function App() {
+const App = () => {
+  const [gameState, setGameState] = useState('create'); // 'create', 'play', 'end'
+  const [gameData, setGameData] = useState(null);
+  const [gameCode, setGameCode] = useState('');
+  const [gameResult, setGameResult] = useState(null);
+
+  const handleCreateGame = (data) => {
+    const code = generateGameCode(data);
+    setGameCode(code);
+    setGameData(data);
+    setGameState('play');
+  };
+
+  const handleJoinGame = () => {
+    const data = parseGameCode(gameCode);
+    if (data) {
+      setGameData(data);
+      setGameState('play');
+    } else {
+      alert('Invalid game code');
+    }
+  };
+
+  const handleGameEnd = (isWin) => {
+    setGameResult(isWin);
+    setGameState('end');
+  };
+
+  const copyGameCode = () => {
+    navigator.clipboard.writeText(gameCode).then(() => {
+      alert('Game code copied to clipboard!');
+    });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container mx-auto p-4">
+      {gameState === 'create' && (
+        <div>
+          <h1 className="text-2xl font-bold mb-4">Create or Join a Game</h1>
+          <GameCreator onCreateGame={handleCreateGame} />
+          <div className="mt-4">
+            <Input
+              value={gameCode}
+              onChange={(e) => setGameCode(e.target.value)}
+              placeholder="Enter game code"
+            />
+            <Button onClick={handleJoinGame} className="mt-2">Join Game</Button>
+          </div>
+        </div>
+      )}
+
+      {gameState === 'play' && gameData && (
+        <div>
+          <Button onClick={copyGameCode} className="mb-4">Copy Game Code</Button>
+          <GameBoard gameData={gameData} onGameEnd={handleGameEnd} />
+        </div>
+      )}
+
+      {gameState === 'end' && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">
+            {gameResult ? 'Congratulations! You won!' : 'Game Over. Try again!'}
+          </h2>
+          <Button onClick={() => setGameState('create')}>New Game</Button>
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default App;
