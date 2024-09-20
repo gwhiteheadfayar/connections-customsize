@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Button from './components/Button';
 import { playClickSound, playSubmitSound, playMistakeSound, playSuccessSound, playLoseSound, playWinSound } from './utils/soundEffects';
 
@@ -11,9 +11,16 @@ const GameBoard = ({ gameData, onGameEnd }) => {
   const wordsPerCategory = gameData.categories[0].words.length;
   const maxMistakes = gameData.gridSize.rows;
 
+  const shuffleBoard = useCallback(() => {
+    const words = gameData.categories.flatMap(category => 
+      category.words.map(word => ({ word, category: category.title }))
+    );
+    setRemainingWords(shuffleArray(words));
+  }, [gameData]);
+
   useEffect(() => {
     shuffleBoard();
-  }, [gameData]);
+  }, [shuffleBoard]);
 
   const shuffleArray = (array) => {
     const newArray = [...array];
@@ -22,13 +29,6 @@ const GameBoard = ({ gameData, onGameEnd }) => {
       [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
     }
     return newArray;
-  };
-
-  const shuffleBoard = () => {
-    const words = gameData.categories.flatMap(category => 
-      category.words.map(word => ({ word, category: category.title }))
-    );
-    setRemainingWords(shuffleArray(words));
   };
 
   const handleCategorySolved = (category) => {
