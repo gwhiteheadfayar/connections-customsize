@@ -7,10 +7,11 @@ import Button from './components/Button';
 import Input from './components/Input';
 
 const App = () => {
-  const [gameState, setGameState] = useState('create'); // 'create', 'play', 'end'
+  const [gameState, setGameState] = useState('create');
   const [gameData, setGameData] = useState(null);
   const [gameCode, setGameCode] = useState('');
   const [gameResult, setGameResult] = useState(null);
+  const [copyButtonText, setCopyButtonText] = useState('Copy Game Code');
 
   const handleCreateGame = (data) => {
     const code = generateGameCode(data);
@@ -36,7 +37,8 @@ const App = () => {
 
   const copyGameCode = () => {
     navigator.clipboard.writeText(gameCode).then(() => {
-      alert('Game code copied to clipboard!');
+      setCopyButtonText('Copied Game Code!');
+      //setTimeout(() => setCopyButtonText('Copy Game Code'), 10000);
     });
   };
 
@@ -59,7 +61,7 @@ const App = () => {
 
       {gameState === 'play' && gameData && (
         <div>
-          <Button onClick={copyGameCode} className="mb-4">Copy Game Code</Button>
+          <Button onClick={copyGameCode} className="mb-4">{copyButtonText}</Button>
           <GameBoard gameData={gameData} onGameEnd={handleGameEnd} />
         </div>
       )}
