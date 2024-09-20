@@ -9,13 +9,10 @@ const GameBoard = ({ gameData, onGameEnd }) => {
   const [remainingWords, setRemainingWords] = useState([]);
 
   const wordsPerCategory = gameData.categories[0].words.length;
-  const maxMistakes = gameData.gridSize.rows; //depends
+  const maxMistakes = gameData.gridSize.rows;
 
   useEffect(() => {
-    const words = gameData.categories.flatMap(category => 
-      category.words.map(word => ({ word, category: category.title }))
-    );
-    setRemainingWords(shuffleArray(words));
+    shuffleBoard();
   }, [gameData]);
 
   const shuffleArray = (array) => {
@@ -25,6 +22,13 @@ const GameBoard = ({ gameData, onGameEnd }) => {
       [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
     }
     return newArray;
+  };
+
+  const shuffleBoard = () => {
+    const words = gameData.categories.flatMap(category => 
+      category.words.map(word => ({ word, category: category.title }))
+    );
+    setRemainingWords(shuffleArray(words));
   };
 
   const handleCategorySolved = (category) => {
@@ -70,31 +74,45 @@ const GameBoard = ({ gameData, onGameEnd }) => {
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-2" style={{ 
-        gridTemplateColumns: `repeat(${gameData.gridSize.cols}, minmax(0, 1fr))`,
-        gridTemplateRows: `repeat(${gameData.gridSize.rows}, minmax(0, 1fr))`
-      }}>
-        {remainingWords.map((wordObj, index) => (
-          <Button
-            key={index}
-            onClick={() => handleWordClick(wordObj.word)}
-            className={`
-              ${selectedWords.includes(wordObj.word) ? 'bg-blue-700' : 'bg-blue-500'}
-              hover:bg-blue-600 text-white
-            `}
-          >
-            {wordObj.word}
-          </Button>
-        ))}
+      <div className="flex justify-center">
+        <div className="w-full max-w-screen-sm">
+          <div className="grid gap-2" style={{ 
+            gridTemplateColumns: `repeat(${gameData.gridSize.cols}, minmax(0, 1fr))`,
+            gridAutoRows: '1fr'
+          }}>
+            {remainingWords.map((wordObj, index) => (
+              <div key={index} className="aspect-square">
+                <Button
+                  onClick={() => handleWordClick(wordObj.word)}
+                  className={`
+                    ${selectedWords.includes(wordObj.word) ? 'bg-blue-700' : 'bg-blue-500'}
+                    hover:bg-blue-600 text-white w-full h-full flex items-center justify-center text-center
+                    text-xs sm:text-sm md:text-base
+                  `}
+                >
+                  <span className="break-words p-1">{wordObj.word}</span>
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
       <div>Mistakes: {mistakes} / {maxMistakes}</div>
-      <Button 
-        onClick={handleSubmitAnswer} 
-        disabled={selectedWords.length !== wordsPerCategory}
-        className="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-      >
-        Submit Answer
-      </Button>
+      <div className="flex space-x-2">
+        <Button 
+          onClick={handleSubmitAnswer} 
+          disabled={selectedWords.length !== wordsPerCategory}
+          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+        >
+          Submit Answer
+        </Button>
+        <Button 
+          onClick={shuffleBoard}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded"
+        >
+          Shuffle Board
+        </Button>
+      </div>
       <div className="space-y-2">
         {solvedCategories.map((category, index) => (
           <div key={index} className="bg-green-100 p-2 rounded">
